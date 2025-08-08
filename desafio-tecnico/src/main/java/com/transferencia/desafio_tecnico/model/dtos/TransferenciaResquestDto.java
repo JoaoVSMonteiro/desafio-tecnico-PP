@@ -11,8 +11,6 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TransferenciaResquestDto {
 
-    private Long id_transacao;
-
     private Long pagador;
 
     private Long recebedor;
