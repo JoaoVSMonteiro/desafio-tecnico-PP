@@ -15,7 +15,7 @@ public class TransferenciaResquestDto {
 
     private Long pagador;
 
-    private Long beneficiario;
+    private Long recebedor;
 
     private Double valor;
 
