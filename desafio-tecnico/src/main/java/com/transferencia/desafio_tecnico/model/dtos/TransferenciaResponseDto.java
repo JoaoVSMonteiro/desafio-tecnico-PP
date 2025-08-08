@@ -11,9 +11,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TransferenciaResponseDto {
 
-    private Long id_transacao;
+    private String id_transacao;
 
     private String mensagem;
 
     private boolean sucesso;
+
 }

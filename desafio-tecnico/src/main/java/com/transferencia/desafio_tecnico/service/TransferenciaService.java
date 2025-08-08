@@ -1,5 +1,6 @@
 package com.transferencia.desafio_tecnico.service;
 
+import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResponseDto;
 import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResquestDto;
 import com.transferencia.desafio_tecnico.model.entity.Carteira;
 import com.transferencia.desafio_tecnico.model.entity.Usuario;
@@ -9,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -23,38 +26,49 @@ public class TransferenciaService {
     private final UsuarioRepository usuarioRepository;
     private final CarteiraRepository carteiraRepository;
 
-    public void transferencia(TransferenciaResquestDto request){
-        log.info("Iniciando Transferência");
+    public TransferenciaResponseDto transferencia(TransferenciaResquestDto request) {
 
-        Usuario pagador = usuarioRepository.findById(request.getPagador())
-                .orElseThrow(() -> new IllegalArgumentException("Pagador não encontrado."));
+        String idTransferencia = UUID.randomUUID().toString();
 
-        Usuario recebedor = usuarioRepository.findById(request.getRecebedor())
-                .orElseThrow(() -> new IllegalArgumentException("Recebedor não encontrado."));
+        log.info("Iniciando Transferência {}", idTransferencia);
 
-        if(pagador.isLojista()){
-            throw  new IllegalArgumentException("Lojista não pode realizar trasnferência.");
-        }
+        try {
+            Usuario pagador = usuarioRepository.findById(request.getPagador())
+                    .orElseThrow(() -> new IllegalArgumentException("Pagador não encontrado."));
 
-        Carteira carteiraPagador = pagador.getCarteira();
-        Carteira carteiraRecebedor = recebedor.getCarteira();
+            Usuario recebedor = usuarioRepository.findById(request.getRecebedor())
+                    .orElseThrow(() -> new IllegalArgumentException("Recebedor não encontrado."));
 
-        if(carteiraPagador.getValor() < request.getValor()){
-            throw new IllegalArgumentException("Saldo insuficiente");
-        }
+            if (pagador.isLojista()) {
+                throw new IllegalArgumentException("Lojista não pode realizar trasnferência.");
+            }
 
-        Boolean autorizador = restTemplate.getForObject(AUTORIZADOR, Boolean.class);
-        if (autorizador == null || !autorizador){
-            throw new IllegalStateException("Transferência não autorizada pelo serviço externo");
-        }
+            Carteira carteiraPagador = pagador.getCarteira();
+            Carteira carteiraRecebedor = recebedor.getCarteira();
 
-        carteiraPagador.setValor(carteiraPagador.getValor() - request.getValor());
-        carteiraRecebedor.setValor(carteiraRecebedor.getValor() + request.getValor());
+            if (carteiraPagador.getValor() < request.getValor()) {
+                throw new IllegalArgumentException("Saldo insuficiente");
+            }
 
-        try{
-            restTemplate.postForLocation(NOTIFICADOR, pagador.getEmail());
+            Boolean autorizador = restTemplate.getForObject(AUTORIZADOR, Boolean.class);
+            if (autorizador == null || !autorizador) {
+                throw new IllegalStateException("Transferência não autorizada pelo serviço externo");
+            }
+
+            carteiraPagador.setValor(carteiraPagador.getValor() - request.getValor());
+            carteiraRecebedor.setValor(carteiraRecebedor.getValor() + request.getValor());
+
+            try {
+                restTemplate.postForLocation(NOTIFICADOR, pagador.getEmail());
+            } catch (Exception e) {
+                log.error("Falha ao enviar notificação: " + e.getMessage());
+            }
+
+            return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
+
         }catch (Exception e){
-            log.error("Falha ao enviar notificação: " + e.getMessage());
+            log.error("Error na transferência{}: {}", idTransferencia, e.getMessage());
+            return new TransferenciaResponseDto(idTransferencia, e.getMessage(), false);
         }
     }
 }
