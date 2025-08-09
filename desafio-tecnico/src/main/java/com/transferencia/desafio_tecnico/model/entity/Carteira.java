@@ -22,7 +22,7 @@ public class Carteira {
     @Column(name = "VALOR", nullable = false)
     private Double valor;
 
-    @ManyToOne
-    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false, unique = true)
+    @OneToOne
+    @JoinColumn(name = "id_usuario", referencedColumnName = "id_usuario", nullable = false)
     private Usuario usuario;
 }
