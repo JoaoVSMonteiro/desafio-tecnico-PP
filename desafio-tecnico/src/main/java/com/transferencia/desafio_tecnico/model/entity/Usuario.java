@@ -24,7 +24,7 @@ public class Usuario {
     @Column(name = "NOME_COMPLETO")
     private String nomeCompleto;
 
-    @Column(name = "CPF_cnpj", unique = true)
+    @Column(name = "CPF_CNPJ", unique = true)
     private String cpf_cnpj;
 
     @Column(name = "EMAIL", unique = true)
@@ -33,8 +33,8 @@ public class Usuario {
     @Column(name = "SENHA")
     private String senha;
 
-    @Column(name = "LOJISTA")
-    private boolean lojista;
+    @Column(name = "IS_LOJISTA")
+    private boolean isLojista;
 
     @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
     private Carteira carteira;
