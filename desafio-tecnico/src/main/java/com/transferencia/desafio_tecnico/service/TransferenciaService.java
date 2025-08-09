@@ -6,6 +6,7 @@ import com.transferencia.desafio_tecnico.model.entity.Carteira;
 import com.transferencia.desafio_tecnico.model.entity.Usuario;
 import com.transferencia.desafio_tecnico.repository.CarteiraRepository;
 import com.transferencia.desafio_tecnico.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class TransferenciaService {
     private final UsuarioRepository usuarioRepository;
     private final CarteiraRepository carteiraRepository;
 
+    @Transactional
     public TransferenciaResponseDto transferencia(TransferenciaResquestDto request) {
 
         String idTransferencia = UUID.randomUUID().toString();
@@ -57,6 +59,9 @@ public class TransferenciaService {
 
             carteiraPagador.setValor(carteiraPagador.getValor() - request.getValor());
             carteiraRecebedor.setValor(carteiraRecebedor.getValor() + request.getValor());
+
+            carteiraRepository.save(carteiraPagador);
+            carteiraRepository.save(carteiraRecebedor);
 
             try {
                 restTemplate.postForLocation(NOTIFICADOR, pagador.getEmail());
