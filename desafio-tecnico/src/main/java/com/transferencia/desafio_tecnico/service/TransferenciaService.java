@@ -1,5 +1,6 @@
 package com.transferencia.desafio_tecnico.service;
 
+import com.transferencia.desafio_tecnico.model.dtos.notificador.NotificadorRequestDto;
 import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResponseDto;
 import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResquestDto;
 import com.transferencia.desafio_tecnico.model.entity.Carteira;
@@ -19,11 +20,8 @@ import java.util.UUID;
 @Slf4j
 public class TransferenciaService {
 
-    private static final String AUTORIZADOR = "https://util.devi.tools/api/v2/authorize";
-    private static final String NOTIFICADOR = "https://util.devi.tools/api/v1/notify";
-
-    private final RestTemplate restTemplate = new RestTemplate();
-
+    private final AutorizadorService autorizadorService;
+    private final NotificadorService notificadorService;
     private final UsuarioRepository usuarioRepository;
     private final CarteiraRepository carteiraRepository;
 
@@ -52,8 +50,7 @@ public class TransferenciaService {
                 throw new IllegalArgumentException("Saldo insuficiente");
             }
 
-            Boolean autorizador = restTemplate.getForObject(AUTORIZADOR, Boolean.class);
-            if (autorizador == null || !autorizador) {
+            if(!autorizadorService.autorizarTransferencia()) {
                 throw new IllegalStateException("Transferência não autorizada pelo serviço externo");
             }
 
@@ -63,11 +60,8 @@ public class TransferenciaService {
             carteiraRepository.save(carteiraPagador);
             carteiraRepository.save(carteiraRecebedor);
 
-            try {
-                restTemplate.postForLocation(NOTIFICADOR, pagador.getEmail());
-            } catch (Exception e) {
-                log.error("Falha ao enviar notificação: " + e.getMessage());
-            }
+            NotificadorRequestDto notificadorRequestDto = new NotificadorRequestDto(pagador.getEmail());
+            notificadorService.enviarNotificacao(notificadorRequestDto);
 
             return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
 
