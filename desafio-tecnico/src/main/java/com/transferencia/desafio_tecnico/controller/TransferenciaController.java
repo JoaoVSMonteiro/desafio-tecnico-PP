@@ -1,7 +1,7 @@
 package com.transferencia.desafio_tecnico.controller;
 
-import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResponseDto;
-import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResquestDto;
+import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResponseDto;
+import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResquestDto;
 import com.transferencia.desafio_tecnico.service.TransferenciaService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
