@@ -1,7 +1,7 @@
 package com.transferencia.desafio_tecnico.service;
 
-import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResponseDto;
-import com.transferencia.desafio_tecnico.model.dtos.TransferenciaResquestDto;
+import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResponseDto;
+import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResquestDto;
 import com.transferencia.desafio_tecnico.model.entity.Carteira;
 import com.transferencia.desafio_tecnico.model.entity.Usuario;
 import com.transferencia.desafio_tecnico.repository.CarteiraRepository;
@@ -72,7 +72,7 @@ public class TransferenciaService {
             return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
 
         }catch (Exception e){
-            log.error("Error na transferência{}: {}", idTransferencia, e.getMessage());
+            log.error("Error na transferência {}: {}", idTransferencia, e.getMessage());
             return new TransferenciaResponseDto(idTransferencia, e.getMessage(), false);
         }
     }

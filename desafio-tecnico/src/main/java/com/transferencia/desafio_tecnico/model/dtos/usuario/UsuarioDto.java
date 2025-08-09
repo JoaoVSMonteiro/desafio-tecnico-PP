@@ -1,4 +1,4 @@
-package com.transferencia.desafio_tecnico.model.dtos;
+package com.transferencia.desafio_tecnico.model.dtos.usuario;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
