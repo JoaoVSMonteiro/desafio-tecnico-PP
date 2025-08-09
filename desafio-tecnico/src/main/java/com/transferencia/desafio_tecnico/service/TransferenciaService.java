@@ -60,7 +60,7 @@ public class TransferenciaService {
             carteiraRepository.save(carteiraPagador);
             carteiraRepository.save(carteiraRecebedor);
 
-            NotificadorRequestDto notificadorRequestDto = new NotificadorRequestDto(pagador.getEmail());
+            NotificadorRequestDto notificadorRequestDto = new NotificadorRequestDto(recebedor.getEmail());
             notificadorService.enviarNotificacao(notificadorRequestDto);
 
             return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
