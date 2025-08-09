@@ -25,11 +25,13 @@ public class NotificadorService {
             NotificadorResponseDto responseDto = restTemplate.postForObject(NOTIFICADOR_URL, requestDto, NotificadorResponseDto.class);
 
             if (responseDto != null && Boolean.TRUE.equals(responseDto.getSuccess())) {
+                log.info("Email enviado com sucesso !!!");
                 return new NotificadorResponseDto("Notificação enviada com sucesso", true);
             } else {
                 return new NotificadorResponseDto("Falha ao enviar notificação", false);
             }
         } catch (Exception e) {
+            log.error("Erro ao envio do email.");
             return new NotificadorResponseDto("Erro ao comunicar com o serviço de notificação", false);
         }
     }

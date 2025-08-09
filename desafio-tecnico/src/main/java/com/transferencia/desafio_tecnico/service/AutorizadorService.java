@@ -18,6 +18,7 @@ public class AutorizadorService {
     public boolean autorizarTransferencia(){
         try {
             AutorizadorResponseDto responseDto = restTemplate.getForObject(AUTORIZADOR_URL, AutorizadorResponseDto.class);
+            log.info("Transferência autorizada com sucesso !!!");
             return responseDto != null && responseDto.getData() != null && responseDto.getData().isAuthorization();
         } catch (Exception e) {
             log.error("Erro ao tentar autorizar transferência: " + e.getMessage());

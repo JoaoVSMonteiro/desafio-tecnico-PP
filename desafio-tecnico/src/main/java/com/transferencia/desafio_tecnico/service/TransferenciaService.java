@@ -63,6 +63,7 @@ public class TransferenciaService {
             NotificadorRequestDto notificadorRequestDto = new NotificadorRequestDto(recebedor.getEmail());
             notificadorService.enviarNotificacao(notificadorRequestDto);
 
+            log.info("A transferência: " + idTransferencia + " foi um sucesso !!!");
             return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
 
         }catch (Exception e){
