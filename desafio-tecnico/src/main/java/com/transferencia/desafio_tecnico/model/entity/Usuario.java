@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -19,13 +22,13 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seq_usuario")
     @SequenceGenerator(name = "seq_usuario", sequenceName = "seq_usuario", allocationSize = 1)
     @Column(name = "ID_USUARIO")
-    private Long id_usuario;
+    private Long idUsuario;
 
     @Column(name = "NOME_COMPLETO")
     private String nomeCompleto;
 
     @Column(name = "CPF_CNPJ", unique = true)
-    private String cpf_cnpj;
+    private String cpfCnpj;
 
     @Column(name = "EMAIL", unique = true)
     private String email;
@@ -33,9 +36,15 @@ public class Usuario {
     @Column(name = "SENHA")
     private String senha;
 
+    @Column(name = "CARTEIRA")
+    private BigDecimal carteira;
+
     @Column(name = "IS_LOJISTA")
     private boolean isLojista;
 
-    @OneToOne(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private Carteira carteira;
+    @OneToMany(mappedBy = "pagador", cascade = CascadeType.ALL)
+    private Set<Transferencia> transferenciasPagador;
+
+    @OneToMany(mappedBy = "recebedor", cascade = CascadeType.ALL)
+    private Set<Transferencia> transferenciasRecebedor;
 }
