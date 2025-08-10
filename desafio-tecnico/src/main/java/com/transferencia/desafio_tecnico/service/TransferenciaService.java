@@ -11,7 +11,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
 
 import java.util.UUID;
 
@@ -29,8 +29,13 @@ public class TransferenciaService {
     public TransferenciaResponseDto transferencia(TransferenciaResquestDto request) {
 
         String idTransferencia = UUID.randomUUID().toString();
+        String horario = java.time.LocalDateTime.now().toString();
 
         log.info("Iniciando Transferência {}", idTransferencia);
+
+        if(request.getPagador().equals(request.getRecebedor())){
+            throw new IllegalArgumentException("Pagador e Recebedor não podem ser o mesmo.");
+        }
 
         try {
             Usuario pagador = usuarioRepository.findById(request.getPagador())
@@ -38,6 +43,7 @@ public class TransferenciaService {
 
             Usuario recebedor = usuarioRepository.findById(request.getRecebedor())
                     .orElseThrow(() -> new IllegalArgumentException("Recebedor não encontrado."));
+
 
             if (pagador.isLojista()) {
                 throw new IllegalArgumentException("Lojista não pode realizar trasnferência.");
@@ -60,15 +66,22 @@ public class TransferenciaService {
             carteiraRepository.save(carteiraPagador);
             carteiraRepository.save(carteiraRecebedor);
 
-            NotificadorRequestDto notificadorRequestDto = new NotificadorRequestDto(recebedor.getEmail());
-            notificadorService.enviarNotificacao(notificadorRequestDto);
+            NotificadorRequestDto notificadorRequestDtoPagador = new NotificadorRequestDto(pagador.getEmail());
+            notificadorService.enviarNotificacao(notificadorRequestDtoPagador);
 
-            log.info("A transferência: " + idTransferencia + " foi um sucesso !!!");
-            return new TransferenciaResponseDto(idTransferencia, "SUCESSO", true);
+            NotificadorRequestDto notificadorRequestDtoRecebedor = new NotificadorRequestDto(recebedor.getEmail());
+            notificadorService.enviarNotificacao(notificadorRequestDtoRecebedor);
+
+            return new TransferenciaResponseDto(idTransferencia, "A transferência foi um sucesso !!!",
+                    true,
+                    pagador.getNomeCompleto(),
+                    recebedor.getNomeCompleto(),
+                    request.getValor(),
+                    horario);
 
         }catch (Exception e){
             log.error("Error na transferência {}: {}", idTransferencia, e.getMessage());
-            return new TransferenciaResponseDto(idTransferencia, e.getMessage(), false);
+            return new TransferenciaResponseDto(idTransferencia, e.getMessage(), false, "N/A", "N/A", 0.0, "N/A");
         }
     }
 }
