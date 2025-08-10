@@ -3,68 +3,69 @@ package com.transferencia.desafio_tecnico.service;
 import com.transferencia.desafio_tecnico.model.dtos.notificador.NotificadorRequestDto;
 import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResponseDto;
 import com.transferencia.desafio_tecnico.model.dtos.transferencia.TransferenciaResquestDto;
-import com.transferencia.desafio_tecnico.model.entity.Carteira;
+import com.transferencia.desafio_tecnico.model.entity.Transferencia;
 import com.transferencia.desafio_tecnico.model.entity.Usuario;
-import com.transferencia.desafio_tecnico.repository.CarteiraRepository;
-import com.transferencia.desafio_tecnico.repository.UsuarioRepository;
+import com.transferencia.desafio_tecnico.repository.TransferenciaRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class TransferenciaService {
 
+    @Autowired
+    private final UsuarioService usuarioService;
+    @Autowired
     private final AutorizadorService autorizadorService;
+    @Autowired
     private final NotificadorService notificadorService;
-    private final UsuarioRepository usuarioRepository;
-    private final CarteiraRepository carteiraRepository;
+    @Autowired
+    private final TransferenciaRepository transferenciaRepository;
+
 
     @Transactional
-    public TransferenciaResponseDto transferencia(TransferenciaResquestDto request) {
+    public TransferenciaResponseDto transferencia(TransferenciaResquestDto request) throws Exception {
+        log.info("Iniciando Transferência");
 
-        String idTransferencia = UUID.randomUUID().toString();
-        String horario = java.time.LocalDateTime.now().toString();
+        LocalDateTime horario = LocalDateTime.now();
 
-        log.info("Iniciando Transferência {}", idTransferencia);
-
-        if(request.getPagador().equals(request.getRecebedor())){
-            throw new IllegalArgumentException("Pagador e Recebedor não podem ser o mesmo.");
+        if (request.getPagador().equals(request.getRecebedor())) {
+            throw new Exception("Pagador não pode fazer transferência para ele mesmo.");
         }
 
         try {
-            Usuario pagador = usuarioRepository.findById(request.getPagador())
-                    .orElseThrow(() -> new IllegalArgumentException("Pagador não encontrado."));
 
-            Usuario recebedor = usuarioRepository.findById(request.getRecebedor())
-                    .orElseThrow(() -> new IllegalArgumentException("Recebedor não encontrado."));
+            Usuario pagador = usuarioService.findUsuarioById(request.getPagador());
+            Usuario recebedor = usuarioService.findUsuarioById(request.getRecebedor());
 
+            usuarioService.validacaoTransferencia(pagador, recebedor.getCarteira());
 
-            if (pagador.isLojista()) {
-                throw new IllegalArgumentException("Lojista não pode realizar trasnferência.");
+            if (!autorizadorService.autorizarTransferencia()) {
+                throw new Exception("Transferência não autorizada pelo serviço externo");
             }
 
-            Carteira carteiraPagador = pagador.getCarteira();
-            Carteira carteiraRecebedor = recebedor.getCarteira();
+            Transferencia transferencia = new Transferencia();
+            transferencia.setTipoTransacao(request.getTipoTransacao());
+            transferencia.setPagador(pagador);
+            transferencia.setRecebedor(recebedor);
+            transferencia.setValor(request.getValor());
+            transferencia.setHorario(horario);
+            transferencia.setComentario(request.getComentario());
 
-            if (carteiraPagador.getValor() < request.getValor()) {
-                throw new IllegalArgumentException("Saldo insuficiente");
-            }
+            pagador.setCarteira(pagador.getCarteira().subtract(request.getValor()));
+            recebedor.setCarteira(recebedor.getCarteira().add(request.getValor()));
 
-            if(!autorizadorService.autorizarTransferencia()) {
-                throw new IllegalStateException("Transferência não autorizada pelo serviço externo");
-            }
-
-            carteiraPagador.setValor(carteiraPagador.getValor() - request.getValor());
-            carteiraRecebedor.setValor(carteiraRecebedor.getValor() + request.getValor());
-
-            carteiraRepository.save(carteiraPagador);
-            carteiraRepository.save(carteiraRecebedor);
+            transferenciaRepository.save(transferencia);
+            usuarioService.salvarUsuario(pagador);
+            usuarioService.salvarUsuario(recebedor);
 
             NotificadorRequestDto notificadorRequestDtoPagador = new NotificadorRequestDto(pagador.getEmail());
             notificadorService.enviarNotificacao(notificadorRequestDtoPagador);
@@ -72,16 +73,18 @@ public class TransferenciaService {
             NotificadorRequestDto notificadorRequestDtoRecebedor = new NotificadorRequestDto(recebedor.getEmail());
             notificadorService.enviarNotificacao(notificadorRequestDtoRecebedor);
 
-            return new TransferenciaResponseDto(idTransferencia, "A transferência foi um sucesso !!!",
-                    true,
+            return new TransferenciaResponseDto(transferencia.getIdTransacao(),
+                    request.getTipoTransacao(),
                     pagador.getNomeCompleto(),
                     recebedor.getNomeCompleto(),
                     request.getValor(),
-                    horario);
+                    horario,
+                    request.getComentario());
 
         }catch (Exception e){
-            log.error("Error na transferência {}: {}", idTransferencia, e.getMessage());
-            return new TransferenciaResponseDto(idTransferencia, e.getMessage(), false, "N/A", "N/A", 0.0, "N/A");
+            log.error("Error na transferência : {}", e.getMessage());
+            return new TransferenciaResponseDto(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
+
 }

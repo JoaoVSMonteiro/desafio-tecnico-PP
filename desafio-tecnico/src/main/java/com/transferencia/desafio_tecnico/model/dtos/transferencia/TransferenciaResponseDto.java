@@ -1,9 +1,14 @@
 package com.transferencia.desafio_tecnico.model.dtos.transferencia;
 
+import com.transferencia.desafio_tecnico.model.enums.TipoTransacao;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,18 +16,20 @@ import lombok.Setter;
 @AllArgsConstructor
 public class TransferenciaResponseDto {
 
-    private String id_transacao;
+    private Long id_transacao;
 
-    private String mensagem;
-
-    private boolean sucesso;
+    private TipoTransacao tipoTransacao;
 
     private String pagador;
 
     private String recebedor;
 
-    private Double valor;
+    private BigDecimal valor;
 
-    private String horario;
+    private LocalDateTime horario;
 
+    private String comentario;
+
+    public TransferenciaResponseDto(HttpStatus httpStatus, String message) {
+    }
 }

@@ -1,9 +1,13 @@
 package com.transferencia.desafio_tecnico.model.dtos.transferencia;
 
+import com.transferencia.desafio_tecnico.model.enums.TipoTransacao;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -15,6 +19,10 @@ public class TransferenciaResquestDto {
 
     private Long recebedor;
 
-    private Double valor;
+    private BigDecimal valor;
+
+    private TipoTransacao tipoTransacao;
+
+    private String comentario;
 
 }
