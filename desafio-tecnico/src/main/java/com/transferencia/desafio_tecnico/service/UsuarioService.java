@@ -19,9 +19,9 @@ import java.math.BigDecimal;
 public class UsuarioService {
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    private UsuarioMapper usuarioMapper;
+    private final UsuarioMapper usuarioMapper;
 
     public void validacaoTransferencia(Usuario pagador, BigDecimal valor) throws Exception {
         if(pagador.isLojista()){
@@ -79,7 +79,7 @@ public class UsuarioService {
 
         usuarioRepository.save(usuarioAtualizar);
 
-        log.info("Usuário atualizado com sucesso. ID={}", usuarioAtualizar.getIdUsuario());
+        log.info("Usuário atualizado com sucesso. ID= {}", usuarioAtualizar.getIdUsuario());
         return usuarioMapper.toDto(usuarioAtualizar);
     }
 

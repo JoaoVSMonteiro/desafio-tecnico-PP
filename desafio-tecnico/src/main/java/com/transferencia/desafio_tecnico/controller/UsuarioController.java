@@ -3,15 +3,17 @@ package com.transferencia.desafio_tecnico.controller;
 import com.transferencia.desafio_tecnico.model.dtos.usuario.UsuarioCreateDto;
 import com.transferencia.desafio_tecnico.model.dtos.usuario.UsuarioDto;
 import com.transferencia.desafio_tecnico.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/usuarios")
+@RequiredArgsConstructor
 public class UsuarioController {
 
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
     @PostMapping
     public ResponseEntity<UsuarioDto> criarUsuario(@RequestBody UsuarioCreateDto usuarioCreateDto){
