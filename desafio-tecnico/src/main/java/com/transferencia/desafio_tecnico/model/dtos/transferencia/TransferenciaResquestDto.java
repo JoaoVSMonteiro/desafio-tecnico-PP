@@ -19,7 +19,7 @@ public class TransferenciaResquestDto {
 
     private Long recebedor;
 
-    private Double valor;
+    private BigDecimal valor;
 
     private TipoTransacao tipoTransacao;
 

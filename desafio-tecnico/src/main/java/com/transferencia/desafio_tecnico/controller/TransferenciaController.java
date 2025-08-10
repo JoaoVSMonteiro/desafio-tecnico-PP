@@ -18,7 +18,7 @@ public class TransferenciaController {
     private final TransferenciaService transferenciaService;
 
     @PostMapping
-    public ResponseEntity<TransferenciaResponseDto> realizarTransferencia(@RequestBody TransferenciaResquestDto resquestDto){
+    public ResponseEntity<TransferenciaResponseDto> realizarTransferencia(@RequestBody TransferenciaResquestDto resquestDto) throws Exception {
         TransferenciaResponseDto responseDto = transferenciaService.transferencia(resquestDto);
         return ResponseEntity.ok(responseDto);
     }

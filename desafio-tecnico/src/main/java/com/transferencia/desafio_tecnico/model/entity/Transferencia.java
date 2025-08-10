@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,15 +28,15 @@ public class Transferencia {
     private TipoTransacao tipoTransacao;
 
     @ManyToOne
-    @JoinColumn(name = "ID_PAGADOR", nullable = false)
+    @JoinColumn(name = "PAGADOR", nullable = false)
     private Usuario pagador;
 
     @ManyToOne
-    @JoinColumn(name = "ID_RECEBEDOR", nullable = false)
+    @JoinColumn(name = "RECEBEDOR", nullable = false)
     private Usuario recebedor;
 
     @Column(name = "VALOR")
-    private Double valor;
+    private BigDecimal valor;
 
     @Column(name = "HORARIO")
     private LocalDateTime horario;

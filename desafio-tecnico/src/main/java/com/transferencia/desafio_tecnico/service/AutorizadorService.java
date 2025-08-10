@@ -21,7 +21,7 @@ public class AutorizadorService {
             log.info("Transferência autorizada com sucesso !!!");
             return responseDto != null && responseDto.getData() != null && responseDto.getData().isAuthorization();
         } catch (Exception e) {
-            log.error("Erro ao tentar autorizar transferência: " + e.getMessage());
+            log.error("Erro ao tentar autorizar transferência: {}", e.getMessage());
             return false;
         }
     }

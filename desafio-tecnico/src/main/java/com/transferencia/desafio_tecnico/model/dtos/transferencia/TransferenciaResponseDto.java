@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,10 +24,12 @@ public class TransferenciaResponseDto {
 
     private String recebedor;
 
-    private Double valor;
+    private BigDecimal valor;
 
     private LocalDateTime horario;
 
     private String comentario;
 
+    public TransferenciaResponseDto(HttpStatus httpStatus, String message) {
+    }
 }

@@ -42,9 +42,4 @@ public class Usuario {
     @Column(name = "IS_LOJISTA")
     private boolean isLojista;
 
-    @OneToMany(mappedBy = "pagador", cascade = CascadeType.ALL)
-    private Set<Transferencia> transferenciasPagador;
-
-    @OneToMany(mappedBy = "recebedor", cascade = CascadeType.ALL)
-    private Set<Transferencia> transferenciasRecebedor;
 }
