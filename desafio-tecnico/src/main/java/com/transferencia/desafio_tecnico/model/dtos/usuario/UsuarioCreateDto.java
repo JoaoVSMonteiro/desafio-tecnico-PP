@@ -11,7 +11,9 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UsuarioDto {
+public class UsuarioCreateDto {
+
+    private Long idUsuario;
 
     private String nomeCompleto;
 
@@ -19,8 +21,9 @@ public class UsuarioDto {
 
     private String email;
 
+    private String senha;
+
     private BigDecimal carteira;
 
     private boolean lojista;
-
 }
