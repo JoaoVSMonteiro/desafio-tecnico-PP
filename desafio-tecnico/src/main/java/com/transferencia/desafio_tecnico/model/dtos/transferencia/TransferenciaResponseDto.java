@@ -25,13 +25,4 @@ public class TransferenciaResponseDto {
 
     private String horario;
 
-    public TransferenciaResponseDto(String idTransferencia, String mensagem, Boolean sucesso) {
-        this.id_transacao = idTransferencia;
-        this.mensagem = mensagem;
-        this.sucesso = sucesso;
-        this.pagador = "";
-        this.recebedor = "";
-        this.valor = 0.0;
-        this.horario = "";
-    }
 }

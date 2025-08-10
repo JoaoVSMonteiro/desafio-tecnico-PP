@@ -24,6 +24,7 @@ public class NotificadorService {
                 log.info("Email enviado com sucesso !!!");
                 return new NotificadorResponseDto("Notificação enviada com sucesso", true);
             } else {
+                log.error("Falha ao enviar notificação para: {}, Resposta: {}", requestDto.getEmail(), responseDto);
                 return new NotificadorResponseDto("Falha ao enviar notificação", false);
             }
         } catch (Exception e) {
